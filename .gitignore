@@ -1,0 +1,9 @@
+/vendor/
+/node_modules/
+.osp/
+.env
+*.log
+.DS_Store
+Thumbs.db
+/uploads/avatars/*
+!/uploads/avatars/.gitkeep
