@@ -41,5 +41,10 @@ try {
         ]
     );
 } catch (PDOException $e) {
-    die('Database connection failed: ' . ($e->getMessage()));
+    if (APP_DEBUG) {
+        die('Database connection failed: ' . $e->getMessage());
+    }
+    error_log('HRMS database connection failed: ' . $e->getMessage());
+    http_response_code(503);
+    die('Service temporarily unavailable.');
 }

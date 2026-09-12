@@ -112,6 +112,40 @@ function verify_captcha(string $answer): bool {
     return $valid;
 }
 
+function login_rate_key(string $email): string {
+    return hash('sha256', ($_SERVER['REMOTE_ADDR'] ?? 'unknown') . '|' . strtolower(trim($email)));
+}
+
+function login_rate_limited(string $email): bool {
+    $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'hrms_login_' . login_rate_key($email) . '.json';
+    if (!is_file($path)) return false;
+    $data = json_decode((string)file_get_contents($path), true) ?: [];
+    return (int)($data['blocked_until'] ?? 0) > time();
+}
+
+function login_rate_failure(string $email): void {
+    $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'hrms_login_' . login_rate_key($email) . '.json';
+    $handle = fopen($path, 'c+');
+    if (!$handle) return;
+    flock($handle, LOCK_EX);
+    $data = json_decode(stream_get_contents($handle), true) ?: [];
+    $now = time();
+    $attempts = (int)($data['attempts'] ?? 0);
+    if ($now - (int)($data['window_start'] ?? $now) > 900) $attempts = 0;
+    $attempts++;
+    ftruncate($handle, 0);
+    rewind($handle);
+    fwrite($handle, json_encode(['attempts' => $attempts, 'window_start' => $data['window_start'] ?? $now, 'blocked_until' => $attempts >= 5 ? $now + 900 : 0]));
+    fflush($handle);
+    flock($handle, LOCK_UN);
+    fclose($handle);
+}
+
+function login_rate_clear(string $email): void {
+    $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'hrms_login_' . login_rate_key($email) . '.json';
+    if (is_file($path)) @unlink($path);
+}
+
 function redirect(string $path): void {
     header('Location: ' . BASE_URL . '/' . ltrim($path, '/'));
     exit;

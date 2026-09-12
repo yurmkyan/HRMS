@@ -13,8 +13,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($id === (int)$me['id']) {
         flash_set('danger', t('Нельзя изменить роль собственной учётной записи.'));
     } else {
+      $roleCheck = $pdo->prepare('SELECT id FROM roles WHERE id = ?');
+      $roleCheck->execute([$roleId]);
+      if (!$roleCheck->fetch()) {
+        flash_set('danger', t('Недопустимая роль.'));
+      } else {
         $pdo->prepare('UPDATE users SET role_id = ? WHERE id = ?')->execute([$roleId, $id]);
         flash_set('success', t('Роль пользователя обновлена.'));
+      }
     }
     redirect('users/list.php');
 }

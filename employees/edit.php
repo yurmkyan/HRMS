@@ -13,7 +13,9 @@ if (!$employee) {
     redirect('employees/list.php');
 }
 
-$employee['role_name'] = $pdo->query('SELECT name FROM roles WHERE id = ' . (int)$employee['role_id'])->fetchColumn();
+$roleNameStmt = $pdo->prepare('SELECT name FROM roles WHERE id = ?');
+$roleNameStmt->execute([(int)$employee['role_id']]);
+$employee['role_name'] = $roleNameStmt->fetchColumn();
 $currentUser = current_user();
 if (!can_edit_employee($currentUser, $employee)) {
   http_response_code(403);
@@ -32,11 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fullName = trim($_POST['full_name'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $roleId = (int)($_POST['role_id'] ?? 0);
-    $departmentId = $_POST['department_id'] !== '' ? (int)$_POST['department_id'] : null;
+    $departmentValue = $_POST['department_id'] ?? '';
+    $departmentId = $departmentValue !== '' ? (int)$departmentValue : null;
     $position = trim($_POST['position'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
     $hireDate = $_POST['hire_date'] ?? null;
-    $salary = $canManageSalary ? (($_POST['salary'] ?? '') !== '' ? (float)$_POST['salary'] : null) : $employee['salary'];
+    $salaryValue = $_POST['salary'] ?? '';
+    $salary = $canManageSalary ? ($salaryValue !== '' ? (float)$salaryValue : null) : $employee['salary'];
     $status = $_POST['status'] ?? 'active';
     $newPassword = $_POST['password'] ?? '';
 
@@ -55,10 +59,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $departmentCheck->execute([$departmentId]);
       if (!$departmentCheck->fetch()) $errors[] = t('Недопустимый отдел.');
     }
-    if ($currentUser['role'] !== 'admin') {
+    if ($currentUser['role'] === 'manager') {
       $roleId = (int)$employee['role_id'];
       $status = $employee['status'];
-      if ($currentUser['role'] === 'manager') $departmentId = $employee['department_id'];
+      $departmentId = $employee['department_id'];
     }
 
     if (!$errors) {

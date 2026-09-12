@@ -33,6 +33,9 @@ function nav_active(string $file, string $current): string {
 
   <div class="sidebar-account">
     <a href="<?= BASE_URL ?>/profile.php">🙍 <span class="label-text"><?= e(t('Мой профиль')) ?></span></a>
-    <a href="<?= BASE_URL ?>/logout.php" class="logout">🚪 <span class="label-text"><?= e(t('Выйти')) ?></span></a>
+    <form method="post" action="<?= BASE_URL ?>/logout.php">
+      <?= csrf_field() ?>
+      <button type="submit" class="logout">🚪 <span class="label-text"><?= e(t('Выйти')) ?></span></button>
+    </form>
   </div>
 </div>

@@ -24,7 +24,7 @@
 
 ### 1. Требования
 
-- PHP >= 8.0 с расширением `pdo_mysql`
+- PHP >= 8.0 с расширениями `pdo_mysql`, `gd` и `mbstring`
 - MySQL или MariaDB >= 10.4
 - Веб-сервер (Apache/Nginx) либо встроенный сервер PHP для разработки
 
@@ -61,11 +61,13 @@ mysql -u root -p < database/seed.sql
 Откройте `config/config.php` и при необходимости измените:
 
 ```php
-define('DB_HOST', '127.0.0.1');
+define('DB_HOST', '127.0.1.19');
 define('DB_NAME', 'hrms_db');
 define('DB_USER', 'root');
 define('DB_PASS', 'ваш_пароль');
 ```
+
+Для локальной отладки можно задать `HRMS_DEBUG=1`. По умолчанию подробные ошибки отключены.
 
 Также можно задать значения через переменные окружения:
 `HRMS_DB_HOST`, `HRMS_DB_NAME`, `HRMS_DB_USER`, `HRMS_DB_PASS`.

@@ -6,6 +6,7 @@ require_login();
 $user = current_user();
 $pageTitle = t('Посещаемость');
 $canSeeAll = in_array($user['role'], ['admin', 'hr', 'manager'], true);
+$teamDepartmentId = $user['role'] === 'manager' ? (int)($user['department_id'] ?? 0) : null;
 $today = date('Y-m-d');
 
 // Handle check-in / check-out actions for the current user
@@ -51,12 +52,15 @@ $history = $stmt->fetchAll();
 // Team-wide view for managers/hr/admin
 $teamToday = [];
 if ($canSeeAll) {
-    $teamToday = $pdo->query(
+  $teamStmt = $pdo->prepare(
         "SELECT a.*, u.full_name, u.position
          FROM attendance a JOIN users u ON u.id = a.user_id
-         WHERE a.work_date = CURDATE()
+     WHERE a.work_date = CURDATE()
+       AND (? IS NULL OR u.department_id = ?)
          ORDER BY a.check_in"
-    )->fetchAll();
+  );
+  $teamStmt->execute([$teamDepartmentId, $teamDepartmentId]);
+  $teamToday = $teamStmt->fetchAll();
 }
 
 include __DIR__ . '/../includes/header.php';

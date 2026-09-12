@@ -23,11 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $roleId = (int)($_POST['role_id'] ?? 0);
-    $departmentId = $_POST['department_id'] !== '' ? (int)$_POST['department_id'] : null;
+    $departmentValue = $_POST['department_id'] ?? '';
+    $departmentId = $departmentValue !== '' ? (int)$departmentValue : null;
     $position = trim($_POST['position'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
     $hireDate = $_POST['hire_date'] ?? null;
-    $salary = $canManageSalary && $_POST['salary'] !== '' ? (float)$_POST['salary'] : null;
+    $salaryValue = $_POST['salary'] ?? '';
+    $salary = $canManageSalary && $salaryValue !== '' ? (float)$salaryValue : null;
 
     if ($fullName === '') $errors[] = t('Укажите ФИО.');
     if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = t('Укажите корректный email.');

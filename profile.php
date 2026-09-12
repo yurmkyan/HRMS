@@ -22,17 +22,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $currentPassword = $_POST['current_password'] ?? '';
     $newPassword = $_POST['new_password'] ?? '';
 
-    $pdo->prepare('UPDATE users SET phone = ? WHERE id = ?')->execute([$phone ?: null, $user['id']]);
-
     if ($newPassword !== '') {
         if (!password_verify($currentPassword, $me['password'])) {
             $errors[] = t('Текущий пароль указан неверно.');
         } elseif (strlen($newPassword) < 6) {
             $errors[] = t('Новый пароль должен содержать минимум 6 символов.');
-        } else {
-            $pdo->prepare('UPDATE users SET password = ? WHERE id = ?')
-                ->execute([password_hash($newPassword, PASSWORD_BCRYPT), $user['id']]);
         }
+    }
+
+    if (!$errors) {
+      $pdo->beginTransaction();
+      try {
+        $pdo->prepare('UPDATE users SET phone = ?, password = ? WHERE id = ?')->execute([
+          $phone ?: null,
+          $newPassword !== '' ? password_hash($newPassword, PASSWORD_BCRYPT) : $me['password'],
+          $user['id'],
+        ]);
+        $pdo->commit();
+      } catch (Throwable $exception) {
+        $pdo->rollBack();
+        $errors[] = t('Не удалось обновить профиль.');
+      }
     }
 
     if (!$errors) {

@@ -20,10 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $canReview) {
       $check = $pdo->prepare(
         "SELECT lr.id FROM leave_requests lr
          JOIN users requester ON requester.id = lr.user_id
-         WHERE lr.id = ? AND lr.status = 'pending'
+        WHERE lr.id = ? AND lr.status = 'pending' AND requester.id <> ?
          AND (? IS NULL OR requester.department_id = ?)"
       );
-      $check->execute([$id, $scopeDepartmentId, $scopeDepartmentId]);
+      $check->execute([$id, $user['id'], $scopeDepartmentId, $scopeDepartmentId]);
       if ($check->fetch()) {
         $pdo->prepare('UPDATE leave_requests SET status = ?, reviewed_by = ? WHERE id = ? AND status = "pending"')
           ->execute([$action, $user['id'], $id]);
@@ -85,7 +85,7 @@ include __DIR__ . '/../includes/header.php';
         <?php if ($canReview): ?><td><?= e($r['full_name']) ?></td><?php endif; ?>
         <td><?= e(t($r['type_name'])) ?></td>
         <td><?= format_date($r['start_date']) ?> – <?= format_date($r['end_date']) ?></td>
-        <td style="max-width:220px;color:var(--muted);"><?= e($r['reason'] ? t($r['reason']) : '—') ?></td>
+        <td style="max-width:220px;color:var(--muted);"><?= e($r['reason'] ?: '—') ?></td>
         <td><?= status_badge($r['status']) ?></td>
         <?php if ($canReview): ?>
         <td class="table-actions">

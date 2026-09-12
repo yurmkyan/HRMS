@@ -57,7 +57,7 @@ include __DIR__ . '/../includes/header.php';
       <?php foreach ($departments as $d): ?>
         <tr>
           <td><strong><?= e($d['name']) ?></strong></td>
-          <td style="color:var(--muted);"><?= e($d['description'] ? t($d['description']) : '—') ?></td>
+          <td style="color:var(--muted);"><?= e($d['description'] ?: '—') ?></td>
           <td><?= $d['emp_count'] ?></td>
           <td class="table-actions">
             <button class="btn btn-outline btn-sm" type="button"

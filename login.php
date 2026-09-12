@@ -15,7 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $captchaAnswer = $_POST['captcha'] ?? '';
   $honeypot = trim($_POST['website'] ?? '');
 
-  if ($honeypot !== '' || !verify_captcha($captchaAnswer)) {
+  if (login_rate_limited($email)) {
+    $error = t('Слишком много попыток. Попробуйте позже.');
+  } elseif ($honeypot !== '' || !verify_captcha($captchaAnswer)) {
     $error = t('Проверка безопасности не пройдена. Обновите код и попробуйте снова.');
   } elseif ($email === '' || $password === '') {
         $error = t('Введите email и пароль.');
@@ -29,10 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $row = $stmt->fetch();
 
         if (!$row || !password_verify($password, $row['password'])) {
+          login_rate_failure($email);
             $error = t('Неверный email или пароль.');
         } elseif ($row['status'] !== 'active') {
             $error = t('Учётная запись деактивирована. Обратитесь к администратору.');
         } else {
+          login_rate_clear($email);
             $_SESSION['user'] = [
                 'id' => $row['id'],
                 'full_name' => $row['full_name'],
@@ -91,9 +95,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <button class="btn btn-primary btn-block" type="submit"><?= e(t('Войти')) ?></button>
     </form>
 
-    <div class="demo">
-      <?= e(t('Демо-доступ:')) ?> <strong>admin@hrms.local</strong> / <strong>Admin123!</strong>
-    </div>
   </div>
 </div>
 </body>

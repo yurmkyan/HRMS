@@ -13,13 +13,17 @@ $todayPresent = (int)$pdo->query("SELECT COUNT(*) c FROM attendance WHERE work_d
 
 // Recent leave requests (scoped to own for employees, all for hr/admin/manager)
 if (in_array($user['role'], ['admin', 'hr', 'manager'], true)) {
-    $recentLeaves = $pdo->query(
+  $dashboardDepartmentId = $user['role'] === 'manager' ? (int)($user['department_id'] ?? 0) : null;
+  $recentStmt = $pdo->prepare(
         "SELECT lr.*, u.full_name, lt.name AS type_name
          FROM leave_requests lr
          JOIN users u ON u.id = lr.user_id
          JOIN leave_types lt ON lt.id = lr.leave_type_id
+     WHERE (? IS NULL OR u.department_id = ?)
          ORDER BY lr.created_at DESC LIMIT 6"
-    )->fetchAll();
+  );
+  $recentStmt->execute([$dashboardDepartmentId, $dashboardDepartmentId]);
+  $recentLeaves = $recentStmt->fetchAll();
 } else {
     $stmt = $pdo->prepare(
         "SELECT lr.*, u.full_name, lt.name AS type_name
