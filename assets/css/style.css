@@ -70,9 +70,11 @@ input:not([type='hidden']):focus, select:focus, textarea:focus { outline: none; 
 .btn-sm { padding: 6px 12px; font-size: 12.5px; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
 thead th { padding: 8px 10px; color: var(--muted); border-bottom: 2px solid var(--line); font-size: 11.5px; letter-spacing: .03em; text-align: left; text-transform: uppercase; }
-tbody td { padding: 12px 10px; border-bottom: 1px solid var(--line); }
+tbody tr { border-bottom: 1px solid var(--line); }
+tbody td { padding: 12px 10px; border-bottom: 0; vertical-align: middle; }
 tbody tr:hover { background: rgba(255, 255, 255, .045); }
 .table-actions { display: flex; gap: 8px; }
+.table-actions:empty { min-height: 36px; }
 .badge { padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 700; }
 .badge-success { color: var(--success); background: rgba(92, 224, 173, .16); }
 .badge-warning { color: var(--warning); background: rgba(243, 200, 111, .16); }
