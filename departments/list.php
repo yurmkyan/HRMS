@@ -45,7 +45,7 @@ $departments = $pdo->query(
 include __DIR__ . '/../includes/header.php';
 ?>
 
-<div style="display:grid;grid-template-columns:1fr 340px;gap:20px;">
+<div class="departments-grid">
   <div class="panel">
     <div class="panel-head"><h3><?= e(t('Список отделов')) ?> (<?= count($departments) ?>)</h3></div>
     <?php if (!$departments): ?>
@@ -72,7 +72,7 @@ include __DIR__ . '/../includes/header.php';
         </tr>
         <tr id="edit-<?= $d['id'] ?>" style="display:none;background:#fafbff;">
           <td colspan="4">
-            <form method="post" style="display:flex;gap:10px;align-items:flex-end;">
+            <form method="post" class="inline-form inline-form-end">
               <?= csrf_field() ?>
               <input type="hidden" name="action" value="update">
               <input type="hidden" name="id" value="<?= $d['id'] ?>">

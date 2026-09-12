@@ -46,7 +46,7 @@ include __DIR__ . '/../includes/header.php';
     <?php endif; ?>
   </div>
 
-  <form method="get" style="display:flex;gap:10px;margin-bottom:18px;">
+  <form method="get" class="employee-filters">
     <input type="text" name="q" placeholder="<?= e(t('Поиск по имени, email, должности...')) ?>" value="<?= e($search) ?>" style="flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:8px;">
     <select name="department" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;">
       <option value=""><?= e(t('Все отделы')) ?></option>

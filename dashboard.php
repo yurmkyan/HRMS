@@ -68,7 +68,7 @@ include __DIR__ . '/includes/header.php';
   </div>
 </div>
 
-<div style="display:grid;grid-template-columns:1.3fr 1fr;gap:20px;">
+<div class="dashboard-grid">
   <div class="panel">
     <div class="panel-head">
       <h3><?= e(t('Последние заявки на отпуск')) ?></h3>
@@ -99,7 +99,7 @@ include __DIR__ . '/includes/header.php';
       <div class="empty-state"><?= e(t('Отделы ещё не созданы.')) ?></div>
     <?php else: foreach ($deptDist as $d): $pct = round(($d['cnt'] / $maxCnt) * 100); ?>
       <div style="margin-bottom:12px;">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+        <div class="distribution-row">
           <span><?= e($d['name']) ?></span><strong><?= $d['cnt'] ?></strong>
         </div>
         <div style="background:#eef0fb;border-radius:6px;height:8px;overflow:hidden;">

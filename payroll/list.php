@@ -76,7 +76,7 @@ include __DIR__ . '/../includes/header.php';
 
 <div class="panel">
   <div class="panel-head"><h3><?= e(t('Начислить зарплату за период')) ?></h3></div>
-  <form method="post" style="display:flex;gap:10px;align-items:flex-end;">
+  <form method="post" class="inline-form inline-form-end payroll-generator">
     <?= csrf_field() ?>
     <input type="hidden" name="action" value="generate">
     <div class="field" style="margin:0;">
@@ -98,7 +98,7 @@ include __DIR__ . '/../includes/header.php';
 <div class="panel">
   <div class="panel-head">
     <h3><?= $months[$month] ?> <?= $year ?> — начисления (<?= count($rows) ?>)</h3>
-    <form method="get" style="display:flex;gap:8px;">
+    <form method="get" class="payroll-period">
       <select name="month" onchange="this.form.submit()">
         <?php foreach ($months as $num => $name): ?>
           <option value="<?= $num ?>" <?= $num == $month ? 'selected' : '' ?>><?= $name ?></option>
@@ -128,7 +128,7 @@ include __DIR__ . '/../includes/header.php';
       </tr>
       <tr id="adj-<?= $r['id'] ?>" style="display:none;background:#fafbff;">
         <td colspan="6">
-          <form method="post" style="display:flex;gap:10px;align-items:flex-end;">
+          <form method="post" class="inline-form inline-form-end">
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="adjust">
             <input type="hidden" name="id" value="<?= $r['id'] ?>">

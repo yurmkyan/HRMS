@@ -68,7 +68,7 @@ include __DIR__ . '/../includes/header.php';
 
 <div class="panel">
   <div class="panel-head"><h3><?= e(t('Сегодня')) ?> — <?= date('d.m.Y') ?></h3></div>
-  <div style="display:flex;gap:14px;align-items:center;">
+  <div class="attendance-actions">
     <div>
       <div style="font-size:13px;color:var(--muted);"><?= e(t('Приход')) ?></div>
       <div style="font-size:20px;font-weight:700;"><?= !empty($todayRow['check_in']) ? substr($todayRow['check_in'],0,5) : '—' ?></div>

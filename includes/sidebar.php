@@ -6,7 +6,7 @@ function nav_active(string $file, string $current): string {
     return $current === $file ? 'active' : '';
 }
 ?>
-<div class="sidebar">
+<aside class="sidebar" id="main-sidebar">
   <div class="brand">🧩 <span class="text">HR<span>MS</span></span></div>
 
   <a href="<?= BASE_URL ?>/dashboard.php" class="<?= nav_active('dashboard.php', $current) ?>">📊 <span class="label-text"><?= e(t('Дашборд')) ?></span></a>
@@ -38,4 +38,5 @@ function nav_active(string $file, string $current): string {
       <button type="submit" class="logout">🚪 <span class="label-text"><?= e(t('Выйти')) ?></span></button>
     </form>
   </div>
-</div>
+</aside>
+<div class="sidebar-backdrop" data-sidebar-close></div>

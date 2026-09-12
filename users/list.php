@@ -45,7 +45,7 @@ include __DIR__ . '/../includes/header.php';
         <td><?= e(role_label($u['role_name'])) ?></td>
         <td><?= status_badge($u['status']) ?></td>
         <td>
-          <form method="post" style="display:flex;gap:8px;">
+          <form method="post" class="role-form">
             <?= csrf_field() ?>
             <input type="hidden" name="id" value="<?= $u['id'] ?>">
             <select name="role_id" <?= $u['id'] == current_user()['id'] ? 'disabled' : '' ?>>
