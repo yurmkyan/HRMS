@@ -6,28 +6,44 @@ require_login();
 $user = current_user();
 $pageTitle = t('Заявки на отпуск');
 $canViewAll = in_array($user['role'], ['admin', 'hr', 'manager'], true);
-$canReview = in_array($user['role'], ['admin', 'manager'], true);
+$canReview = in_array($user['role'], ['admin', 'hr', 'manager'], true);
+
+$scopeDepartmentId = $user['role'] === 'admin' ? null : (int)($user['department_id'] ?? 0);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $canReview) {
     verify_csrf();
     $id = (int)($_POST['id'] ?? 0);
     $action = $_POST['action'] ?? '';
     if (in_array($action, ['approved', 'rejected'], true)) {
-        $pdo->prepare('UPDATE leave_requests SET status = ?, reviewed_by = ? WHERE id = ?')
-            ->execute([$action, $user['id'], $id]);
+      $check = $pdo->prepare(
+        "SELECT lr.id FROM leave_requests lr
+         JOIN users requester ON requester.id = lr.user_id
+         WHERE lr.id = ? AND lr.status = 'pending'
+         AND (? IS NULL OR requester.department_id = ?)"
+      );
+      $check->execute([$id, $scopeDepartmentId, $scopeDepartmentId]);
+      if ($check->fetch()) {
+        $pdo->prepare('UPDATE leave_requests SET status = ?, reviewed_by = ? WHERE id = ? AND status = "pending"')
+          ->execute([$action, $user['id'], $id]);
         flash_set('success', 'Заявка обновлена.');
+      } else {
+        flash_set('warning', 'Заявка уже рассмотрена или недоступна.');
+      }
     }
     redirect('leave/list.php');
 }
 
 if ($canViewAll) {
-    $requests = $pdo->query(
-        "SELECT lr.*, u.full_name, lt.name AS type_name
+  $stmt = $pdo->prepare(
+    "SELECT lr.*, u.full_name, lt.name AS type_name
          FROM leave_requests lr
          JOIN users u ON u.id = lr.user_id
          JOIN leave_types lt ON lt.id = lr.leave_type_id
-         ORDER BY FIELD(lr.status,'pending','approved','rejected'), lr.created_at DESC"
-    )->fetchAll();
+     WHERE (? IS NULL OR u.department_id = ?)
+     ORDER BY FIELD(lr.status,'pending','approved','rejected'), lr.created_at DESC"
+  );
+  $stmt->execute([$scopeDepartmentId, $scopeDepartmentId]);
+  $requests = $stmt->fetchAll();
 } else {
     $stmt = $pdo->prepare(
         "SELECT lr.*, u.full_name, lt.name AS type_name

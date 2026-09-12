@@ -37,7 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($action === 'adjust') {
         $id = (int)$_POST['id'];
       $bonus = max(0, (float)($_POST['bonus'] ?? 0));
-      $deductions = max(0, (float)($_POST['deductions'] ?? 0));
         $row = $pdo->prepare('SELECT base_salary FROM payroll WHERE id=?');
         $row->execute([$id]);
       $payroll = $row->fetch();
@@ -46,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('payroll/list.php');
       }
       $base = (float)$payroll['base_salary'];
+        $deductions = min(max(0, (float)($_POST['deductions'] ?? 0)), $base + $bonus);
         $total = $base + $bonus - $deductions;
         $pdo->prepare('UPDATE payroll SET bonus=?, deductions=?, total=? WHERE id=?')
             ->execute([$bonus, $deductions, $total, $id]);

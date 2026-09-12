@@ -12,8 +12,8 @@ define('DB_PASS', getenv('HRMS_DB_PASS') ?: '');
 define('APP_NAME', 'HRMS');
 define('BASE_URL', ''); // e.g. '/hrms' if installed in a subfolder, otherwise leave empty
 
-// Show errors while developing. Set to false in production.
-define('APP_DEBUG', true);
+// Set HRMS_DEBUG=1 only for local development.
+define('APP_DEBUG', filter_var(getenv('HRMS_DEBUG') ?: '0', FILTER_VALIDATE_BOOLEAN));
 
 if (APP_DEBUG) {
     ini_set('display_errors', 1);
