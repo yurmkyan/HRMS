@@ -8,7 +8,9 @@ $pageTitle = t('Заявки на отпуск');
 $canViewAll = in_array($user['role'], ['admin', 'hr', 'manager'], true);
 $canReview = in_array($user['role'], ['admin', 'hr', 'manager'], true);
 
-$scopeDepartmentId = $user['role'] === 'admin' ? null : (int)($user['department_id'] ?? 0);
+$scopeDepartmentId = in_array($user['role'], ['admin', 'hr'], true)
+  ? null
+  : (int)($user['department_id'] ?? 0);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $canReview) {
     verify_csrf();
