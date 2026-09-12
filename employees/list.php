@@ -6,6 +6,7 @@ require_login();
 $user = current_user();
 $pageTitle = t('Сотрудники');
 $canManage = can_create_employee($user);
+$canSeeActions = in_array($user['role'], ['admin', 'hr', 'manager'], true);
 
 $search = trim($_GET['q'] ?? '');
 $deptFilter = $_GET['department'] ?? '';
@@ -63,7 +64,7 @@ include __DIR__ . '/../includes/header.php';
     <thead>
       <tr>
         <th><?= e(t('Имя')) ?></th><th><?= e(t('Должность')) ?></th><th><?= e(t('Отдел')) ?></th><th><?= e(t('Роль')) ?></th><th><?= e(t('Дата приёма')) ?></th><th><?= e(t('Статус')) ?></th>
-        <?php if ($canManage): ?><th><?= e(t('Действия')) ?></th><?php endif; ?>
+        <?php if ($canSeeActions): ?><th><?= e(t('Действия')) ?></th><?php endif; ?>
       </tr>
     </thead>
     <tbody>
@@ -78,15 +79,17 @@ include __DIR__ . '/../includes/header.php';
         <td><?= e(role_label($emp['role_name'])) ?></td>
         <td><?= format_date($emp['hire_date']) ?></td>
         <td><?= status_badge($emp['status']) ?></td>
-        <?php if (can_edit_employee($user, $emp)): ?>
+        <?php if ($canSeeActions): ?>
         <td class="table-actions">
-          <a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/employees/edit.php?id=<?= $emp['id'] ?>"><?= e(t('Изменить')) ?></a>
-          <?php if ($emp['id'] != $user['id']): ?>
-          <form method="post" action="<?= BASE_URL ?>/employees/delete.php" onsubmit="return confirm('Деактивировать сотрудника «<?= e($emp['full_name']) ?>»?');" style="display:inline;">
-            <?= csrf_field() ?>
-            <input type="hidden" name="id" value="<?= $emp['id'] ?>">
-            <button class="btn btn-danger btn-sm" type="submit"><?= e(t('Удалить')) ?></button>
-          </form>
+          <?php if (can_edit_employee($user, $emp)): ?>
+            <a class="btn btn-outline btn-sm" href="<?= BASE_URL ?>/employees/edit.php?id=<?= $emp['id'] ?>"><?= e(t('Изменить')) ?></a>
+            <?php if ($emp['id'] != $user['id']): ?>
+            <form method="post" action="<?= BASE_URL ?>/employees/delete.php" onsubmit="return confirm('Деактивировать сотрудника «<?= e($emp['full_name']) ?>»?');" style="display:inline;">
+              <?= csrf_field() ?>
+              <input type="hidden" name="id" value="<?= $emp['id'] ?>">
+              <button class="btn btn-danger btn-sm" type="submit"><?= e(t('Удалить')) ?></button>
+            </form>
+            <?php endif; ?>
           <?php endif; ?>
         </td>
         <?php endif; ?>
