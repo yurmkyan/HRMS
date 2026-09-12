@@ -13,7 +13,7 @@ function nav_active(string $file, string $current): string {
 
   <div class="section-label label-text"><?= e(t('Кадры')) ?></div>
   <a href="<?= BASE_URL ?>/employees/list.php" class="<?= str_contains($_SERVER['SCRIPT_NAME'],'employees') ? 'active' : '' ?>">👤 <span class="label-text"><?= e(t('Сотрудники')) ?></span></a>
-  <?php if ($role === 'admin'): ?>
+  <?php if (in_array($role, ['admin', 'hr'], true)): ?>
   <a href="<?= BASE_URL ?>/departments/list.php" class="<?= str_contains($_SERVER['SCRIPT_NAME'],'departments') ? 'active' : '' ?>">🏢 <span class="label-text"><?= e(t('Отделы')) ?></span></a>
   <?php endif; ?>
 
